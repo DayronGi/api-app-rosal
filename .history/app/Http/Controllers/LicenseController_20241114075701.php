@@ -28,7 +28,7 @@ class LicenseController extends Controller
         //         });
         //     }
 
-        $licenses = License::where('status', '!=', 28)->with(['worker:user_data_id,name,document_number,document_type', 'creation:user_id,username']);
+        $licenses = License::where('status', '!=', 28)->with(['worker', 'creation'])
 
         $licenses = $licenses->orderBy('license_id','desc')->simplePaginate(8);
 

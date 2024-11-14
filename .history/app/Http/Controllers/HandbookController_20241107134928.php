@@ -30,7 +30,7 @@ class HandbookController extends Controller
 
         $perPage = $request->input('per_page', 8);
 
-        $handbooks = Handbook::orderBy('handbook_id', 'desc')->with('creation:user_id,username','department:department_id,department_name')->simplePaginate($perPage);
+        $handbooks = Handbook::orderBy('handbook_id', 'desc')->simplePaginate($perPage);
 
         return response()->json(['handbooks' => $handbooks]);
     }
