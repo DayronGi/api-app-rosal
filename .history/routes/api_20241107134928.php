@@ -62,7 +62,5 @@ Route::get('/rosal', function () {
 });
 
 Route::get('/login', function () {
-
-    
     return view('login.view');
 });
