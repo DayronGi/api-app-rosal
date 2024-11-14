@@ -34,7 +34,7 @@ class TaskController extends Controller
         // foreach ($tasks as $task) {
         //     $task->total = $task->cantidad_unidades * $task->precio_unidad;
         // }
-        $perPage = $request->get('per_page', 10);
+        $perPage = $request->get('per_page', 2);
 
         $tasks = Task::with(['creation', 'worker', 'job','plant'])->simplePaginate($perPage);
 

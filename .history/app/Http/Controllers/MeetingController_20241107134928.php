@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Meeting;
 use Illuminate\Http\Request;
-use App\Models\AssignedTask;
 use Illuminate\Support\Facades\Redirect;
 
-class AssignedTaskController extends Controller
+class MeetingController extends Controller
 {
     public static function list(Request $request) {
 
@@ -14,26 +14,28 @@ class AssignedTaskController extends Controller
         // $dateEnd = $request->session()->get('dateEnd') ?? '';
         // $workerName = $request->session()->get('keyword') ?? '';
 
-        // $assignedtasks = AssignedTask::query();
+        // $meetings = Meeting::query();
         //     if ($dateIni) {
-        //         $assignedtasks->whereDate('start_date', '>=', $dateIni);
+        //         $meetings->whereDate('meeting_date', '>=', $dateIni);
         //     }
         //     if ($dateEnd) {
-        //         $assignedtasks->whereDate('start_date', '<=', $dateEnd);
+        //         $meetings->whereDate('meeting_date', '<=', $dateEnd);
         //     }
         //     if ($workerName) {
-        //         $assignedtasks->whereHas('worker', function($query) use ($workerName) {
+        //         $meetings->whereHas('worker', function($query) use ($workerName) {
         //             $query->whereRaw("UPPER(name) LIKE '%".strtoupper($workerName)."%'");
         //         });
         //     }
 
-        //     $assignedtasks = $assignedtasks->orderBy('task_id','desc')->simplePaginate(10);
+        //     $meetings = $meetings->orderBy('meeting_id','desc')->simplePaginate(7);
 
-        $perPage = $request->get('per_page', 10);
-        //with method is used to eager load the relationships :'D
-        $assignedtasks = AssignedTask::with(['creation', 'worker', 'department'])->simplePaginate($perPage);
+        $perPage = $request->get('per_page', 7);
 
-        return response()->json(['assignedtasks' => $assignedtasks]);
+        $meetings = Meeting::simplePaginate($perPage);
+
+        return response()->json([
+            'meetings' => $meetings
+        ]);
     }
 
     public function search(Request $request) {
@@ -47,12 +49,14 @@ class AssignedTaskController extends Controller
             $request->session()->put('dateEnd', $request->get('date_end'));
             $request->session()->put('keyword', $request->get('keyword'));
         }
-        return Redirect::to('/assignedtasks');
+        return Redirect::to('/meetings');
     }
 
-    public function view($task_id) {
-        $assignedtasks = AssignedTask::where('task_id', $task_id)->first();
+    public function view($meeting_id) {
+        $meeting = Meeting::where('meeting_id', $meeting_id)->first();
 
-        return response()->json(['assignedtasks' => $assignedtasks]);
+        return response()->json([
+            'meeting' => $meeting
+        ]);
     }
 }

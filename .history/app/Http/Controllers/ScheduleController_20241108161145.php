@@ -13,7 +13,8 @@ class ScheduleController extends Controller
 {
     public function list()
     {
-       
+        $schedules = Schedule::with(['department', 'scheduledWorkers.worker'  // Aquí seleccionas los campos que necesitas del Worker
+    ])->get();
         $schedules = Schedule::with(['department', 'scheduledWorkers.worker','scheduledWorkers'=> function($query) {
             $query->select('scheduled_workers_id', 'schedule_id', 'worker_id', 'day', 'hour_ini1', 'hour_end1', 'hour_ini2', 'hour_end2');
         }])->get();

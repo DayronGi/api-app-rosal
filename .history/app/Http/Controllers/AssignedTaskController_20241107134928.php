@@ -30,8 +30,8 @@ class AssignedTaskController extends Controller
         //     $assignedtasks = $assignedtasks->orderBy('task_id','desc')->simplePaginate(10);
 
         $perPage = $request->get('per_page', 10);
-        //with method is used to eager load the relationships :'D
-        $assignedtasks = AssignedTask::with(['creation', 'worker', 'department'])->simplePaginate($perPage);
+
+        $assignedtasks = AssignedTask::simplePaginate($perPage);
 
         return response()->json(['assignedtasks' => $assignedtasks]);
     }
