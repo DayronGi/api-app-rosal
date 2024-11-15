@@ -17,11 +17,6 @@ class Handbook extends Model
         return $this->belongsTo(UserAccount::class, 'created_by', 'user_id');
     }
 
-    public function updateByUser(): BelongsTo
-    {
-        return $this->belongsTo(UserAccount::class, 'updated_by', 'user_id');
-    }
-
     public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class, 'department_id', 'department_id');
