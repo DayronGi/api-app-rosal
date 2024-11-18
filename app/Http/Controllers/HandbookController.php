@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Handbook;
 use App\Models\HandbookSection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
 
 class HandbookController extends Controller
 {
@@ -33,6 +34,44 @@ class HandbookController extends Controller
         $handbooks = Handbook::orderBy('handbook_id', 'desc')->with('creation:user_id,username','department:department_id,department_name','updateByUser:user_id,username')->simplePaginate($perPage);
 
         return response()->json(['handbooks' => $handbooks]);
+    }
+
+    public function search(Request $request)
+    {
+        //obtener parametros de la paginación
+        $perPage = $request->get('per_page');
+        //obtener parametros de busqueda
+        $departmentName = $request->get('departmentName');
+        $positionName = $request->get('positionName');
+        $handbookTitle = $request->get('handbookTitle');
+
+        $handbooks = Handbook::query()->with(   'creation:user_id,username',
+                                            'department:department_id,department_name',
+                                            'updateByUser:user_id,username');
+
+        // Filtrar por fecha de inicio  
+        if ($departmentName) {
+            $handbooks->whereHas('department', function ($query) use ($departmentName) {
+                $query->whereRaw('LOWER(department_name) LIKE ?', ['%' . strtolower($departmentName) . '%']);
+            });
+        }
+    
+        // Filtrar por nombre de posición
+        if ($positionName) {
+            $handbooks->whereRaw('LOWER(position_name) LIKE ? ', ['%' . strtolower($positionName) . '%']);
+
+        }
+
+        // Filtrar por nombre de trabajador
+        if ($handbookTitle) {
+            $handbooks->whereRaw('LOWER(handbook_title) LIKE ? ', ['%' . strtolower($handbookTitle) . '%']);
+        
+        }
+
+        // Ejecutar la consulta y devolver los resultados
+            $handbooks = $handbooks->paginate($perPage);
+
+        return response()->json($handbooks);
     }
 
     public function view($handbook_id)

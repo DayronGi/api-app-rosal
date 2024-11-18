@@ -13,53 +13,54 @@ class TaskController extends Controller
 {
     public function list(Request $request) {
 
-        // $dateIni = $request->session()->get('dateIni') ?? '';
-        // $dateEnd = $request->session()->get('dateEnd') ?? '';
-        // $workerName = $request->session()->get('keyword') ?? '';
+           // Obtener parámetros para la paginación
+           $perPage = $request->get('per_page');
 
-        // $tasks = Task::query();
-        // if ($dateIni) {
-        //     $tasks->whereDate('day', '>=', $dateIni);
-        // }
-        // if ($dateEnd) {
-        //     $tasks->whereDate('day', '<=', $dateEnd);
-        // }
-        // if ($workerName) {
-        //     $tasks->whereHas('worker', function($query) use ($workerName) {
-        //         $query->whereRaw("UPPER(name) LIKE '%".strtoupper($workerName)."%'");
-        //     });
-        // }
-        // $tasks = $tasks->orderBy('task_id','desc')->simplePaginate(7);
 
-        // foreach ($tasks as $task) {
-        //     $task->total = $task->cantidad_unidades * $task->precio_unidad;
-        // }
-        $perPage = $request->get('per_page', 10);
+        $tasks = Task::with([   'creation:created_by,user_id,username', 
+                                'worker:user_data_id,document_type,document_number,name',
+                                'job:job_id,job_description'])->paginate($perPage);
 
-        $tasks = Task::with(['creation', 'worker', 'job','plant'])->simplePaginate($perPage);
-
-        return response()->json([
-            'tasks' => $tasks
-        ]);
+        return response()->json(['tasks' => $tasks]);
     }
 
-    public function search(Request $request) {
-        if ($request->get('action') == 'CLEAR') {
-            $dateIni = '';
-            $dateEnd = '';
-            $keyword = '';
+    public function search(Request $request)
+    {
+        //obtener parametros de la paginación
+        $perPage = $request->get('per_page');
+        //obtener parametros de busqueda
+        $dateIni = $request->get('dateIni');
+        $dateEnd = $request->get('dateEnd');
+        $name = $request->get('name');
+
+        $tasks = Task::query()->with([  'creation:created_by,user_id,username',
+                                        'worker:user_data_id,document_type,document_number,name', 
+                                        'job:job_id,job_description']);
+
+        // Filtrar por fecha de inicio  
+        if ($dateIni) { 
+            $tasks->whereDate('day', '>=', $dateIni); 
         }
-        if ($request->get('action') == 'SEARCH') {
-            $dateIni = $request->get('date_ini');
-            $dateEnd = $request->get('date_end');
-            $keyword = $request->get('keyword');
+
+        // Filtrar por fecha de fin
+        if ($dateEnd) { 
+            $tasks->whereDate('day', '<=', $dateEnd);
         }
-        return response()->json([
-            'date_ini' => $dateIni,
-            'date_end' => $dateEnd,
-            'keyword' => $keyword,
-        ]);
+
+        // Filtrar por nombre de trabajador
+        if ($name) {
+            $tasks->whereHas('worker', function ($query) use ($name) {
+                $query->whereRaw('LOWER(user_data.name) LIKE ?', ['%' . strtolower($name) . '%']);
+            });
+        }
+
+        // Ejecutar la consulta y devolver los resultados
+            $tasks = $tasks->paginate($perPage);
+
+        return response()->json($tasks);
     }
+        
+    
 
     public function create() {
         $workers = Worker::select('user_data_id', 'name', 'document_type', 'document_number')->get();

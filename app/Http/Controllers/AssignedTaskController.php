@@ -36,18 +36,46 @@ class AssignedTaskController extends Controller
         return response()->json(['assignedtasks' => $assignedtasks]);
     }
 
-    public function search(Request $request) {
-        if ($request->get('action')=='CLEAR') {
-            $request->session()->put('dateIni', '');
-            $request->session()->put('dateEnd', '');
-            $request->session()->put('keyword', '');
+    public function search(Request $request)
+    {
+        $page = $request->get('page');
+        
+
+        //obtener parametros de la paginación
+        $perPage = $request->get('per_page');
+        //obtener parametros de busqueda
+        $dateIni = $request->get('dateIni');
+        $dateEnd = $request->get('dateEnd');
+        $name = $request->get('name');
+
+        $assignedtasks = AssignedTask::query()->where('status', '!=', 28)
+                                    ->with(['worker:user_data_id,name,document_number,document_type',
+                                            'creation:user_id,username',
+                                            'department:department_id,department_name']);
+
+
+        // Filtrar por fecha de inicio  
+        if ($dateIni) { 
+            $assignedtasks->whereDate('start_date', '>=', $dateIni); 
         }
-        if ($request->get('action')=='SEARCH') {
-            $request->session()->put('dateIni', $request->get('date_ini'));
-            $request->session()->put('dateEnd', $request->get('date_end'));
-            $request->session()->put('keyword', $request->get('keyword'));
+
+        // Filtrar por fecha de fin
+        if ($dateEnd) { 
+            $assignedtasks->whereDate('start_date', '<=', $dateEnd);
         }
-        return Redirect::to('/assignedtasks');
+
+        // Filtrar por nombre de trabajador
+        if ($name) {
+            $assignedtasks->whereHas('worker', function ($query) use ($name) {
+                $query->whereRaw('LOWER(user_data.name) LIKE ?', ['%' . strtolower($name) . '%']);
+            });
+        }
+        
+        // Ejecutar la consulta y devolver los resultados
+            $assignedtasks = $assignedtasks->paginate($perPage);
+    
+
+        return response()->json($assignedtasks);
     }
 
     public function view($task_id) {

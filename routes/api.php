@@ -45,6 +45,7 @@ Route::controller(MeetingController::class)->group(function() {
 
 Route::controller(HandbookController::class)->group(function() {
     Route::get('handbooks', 'list');
+    Route::post('handbooks/search', 'search');
     Route::get('handbooks/{handbook_id}', 'view');
 });
 

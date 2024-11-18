@@ -35,18 +35,45 @@ class LicenseController extends Controller
         return response()->json(['licenses' => $licenses]);
     }
 
-    public function search(Request $request) {
-        if ($request->get('action')=='CLEAR') {
-            $request->session()->put('dateIni', '');
-            $request->session()->put('dateEnd', '');
-            $request->session()->put('keyword', '');
+    public function search(Request $request)
+    {
+        $page = $request->get('page');
+        
+
+        //obtener parametros de la paginación
+        $perPage = $request->get('per_page');
+        //obtener parametros de busqueda
+        $dateIni = $request->get('dateIni');
+        $dateEnd = $request->get('dateEnd');
+        $name = $request->get('name');
+
+        $licenses = License::query()->where('status', '!=', 28)
+                                    ->with(['worker:user_data_id,name,document_number,document_type',
+                                            'creation:user_id,username']);
+
+
+        // Filtrar por fecha de inicio  
+        if ($dateIni) { 
+            $licenses->whereDate('creation_date', '>=', $dateIni); 
         }
-        if ($request->get('action')=='SEARCH') {
-            $request->session()->put('dateIni', $request->get('date_ini'));
-            $request->session()->put('dateEnd', $request->get('date_end'));
-            $request->session()->put('keyword', $request->get('keyword'));
+
+        // Filtrar por fecha de fin
+        if ($dateEnd) { 
+            $licenses->whereDate('creation_date', '<=', $dateEnd);
         }
-        return Redirect::to('/licenses');
+
+        // Filtrar por nombre de trabajador
+        if ($name) {
+            $licenses->whereHas('worker', function ($query) use ($name) {
+                $query->whereRaw('LOWER(user_data.name) LIKE?', ['%' . strtolower($name) . '%']);
+            });
+        }
+        
+        // Ejecutar la consulta y devolver los resultados
+            $licenses = $licenses->paginate($perPage);
+    
+
+        return response()->json($licenses);
     }
 
     public function create() {
