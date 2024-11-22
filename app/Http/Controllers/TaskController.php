@@ -8,6 +8,7 @@ use App\Models\Task;
 use App\Models\Worker;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Validator;
 
 class TaskController extends Controller
 {
@@ -26,36 +27,44 @@ class TaskController extends Controller
 
     public function search(Request $request)
     {
-        //obtener parametros de la paginación
-        $perPage = $request->get('per_page');
-        //obtener parametros de busqueda
-        $dateIni = $request->get('dateIni');
-        $dateEnd = $request->get('dateEnd');
-        $name = $request->get('name');
+        // Validar los parámetros
+        $validatedData = $request->validate([
+            'per_page' => 'nullable|integer|min:1|max:100', // Límite de paginación
+            'dateIni' => 'nullable|date', // Fecha inicial
+            'dateEnd' => 'nullable|date|after_or_equal:dateIni', // Fecha final debe ser igual o posterior
+            'name' => 'nullable|string|max:255', // Nombre del trabajador
+        ]);
 
-        $tasks = Task::query()->with([  'creation:created_by,user_id,username',
-                                        'worker:user_data_id,document_type,document_number,name', 
-                                        'job:job_id,job_description']);
+        // Parámetros de paginación
+        $perPage = $validatedData['per_page'] ?? 10;
 
-        // Filtrar por fecha de inicio  
-        if ($dateIni) { 
-            $tasks->whereDate('day', '>=', $dateIni); 
+        // Construir la consulta
+        $tasks = Task::query()->with([
+            'creation:created_by,user_id,username',
+            'worker:user_data_id,document_type,document_number,name',
+            'job:job_id,job_description'
+        ]);
+
+        // Filtrar por fecha de inicio
+        if (!empty($validatedData['dateIni'])) {
+            $tasks->whereDate('day', '>=', $validatedData['dateIni']);
         }
 
         // Filtrar por fecha de fin
-        if ($dateEnd) { 
-            $tasks->whereDate('day', '<=', $dateEnd);
+        if (!empty($validatedData['dateEnd'])) {
+            $tasks->whereDate('day', '<=', $validatedData['dateEnd']);
         }
 
         // Filtrar por nombre de trabajador
-        if ($name) {
+        if (!empty($validatedData['name'])) {
+            $name = strtolower($validatedData['name']);
             $tasks->whereHas('worker', function ($query) use ($name) {
-                $query->whereRaw('LOWER(user_data.name) LIKE ?', ['%' . strtolower($name) . '%']);
+                $query->whereRaw('LOWER(user_data.name) LIKE ?', ['%' . $name . '%']);
             });
         }
 
-        // Ejecutar la consulta y devolver los resultados
-            $tasks = $tasks->paginate($perPage);
+        // Ejecutar la consulta y devolver los resultados paginados
+        $tasks = $tasks->paginate($perPage);
 
         return response()->json($tasks);
     }
@@ -74,9 +83,52 @@ class TaskController extends Controller
         ]);
     }
 
-    public function store(Request $request) {
-        $task = new Task();
+    //funcion para calcular la expresion matematica de eval
+    public function calculateExpression($expression)
+    {
+        // Asegúrate de que solo permite números, operadores básicos y espacios
+        if ($expression == null) {
+            return 0;
+        }
 
+        // Usa eval() de forma controlada
+        try {
+            return eval("return $expression;");
+        } catch (\Throwable $e) {
+            throw new \InvalidArgumentException('Error al evaluar la expresión.');
+        }
+    }
+
+    public function store(Request $request)
+    {
+        
+        // Validar los datos
+        $validator = Validator::make($request->all(), [
+            'day' => 'required|date',
+            'worker_id' => 'required|exists:user_data,user_data_id',
+            'job_id' => 'required|exists:jobs,job_id',
+            'plant_id' => 'required|exists:products,product_id',
+            'plant_from_id' => 'nullable|exists:products,product_id',
+            'seccion' => 'nullable|string|max:4',
+            'seccion_origen' => 'nullable|string|max:4',
+            'mesa' => 'nullable|string|max:4',
+            'cantidad_ingresada' => 'required|string|min:0',
+            'cantidad_usada' => 'nullable|string|min:0',
+            'precio_unidad' => 'required|numeric|min:0',
+            'observations' => 'required|string|max:1000',
+            'calification' => 'nullable|numeric|min:0|max:100',
+        ]);
+        
+        if ($validator->fails()) {
+            // Personalizar la respuesta
+            return response()->json([
+                'message' => 'Validation Error',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        // Crear la tarea
+        $task = new Task();
         $task->day = $request->day;
         $task->worker_id = $request->worker_id;
         $task->job_id = $request->job_id;
@@ -86,18 +138,50 @@ class TaskController extends Controller
         $task->seccion_origen = $request->seccion_origen;
         $task->mesa = $request->mesa;
         $task->cantidad_ingresada = $request->cantidad_ingresada;
-        $task->cantidad_unidades = eval("return ".$request->cantidad_ingresada.";");
-        $task->cantidad_usada = eval("return ".$request->cantidad_usada.";");
         $task->precio_unidad = $request->precio_unidad;
         $task->observations = $request->observations;
         $task->calification = $request->calification;
-        $task->created_by = auth()->user()->user_id;
+        if (preg_match('#^\d+:\d+$#', $request->cantidad_ingresada)) {
+
+            // Normalizar el formato (asegurar HH:MM con ceros iniciales)
+            list($hours, $minutes) = explode(':', $request->cantidad_ingresada);// Separar horas y minutos
+
+            $hours = str_pad($hours, 2, '0', STR_PAD_LEFT); // Asegurar 2 dígitos en horas organizandolos a la izquierda
+            $minutes = str_pad($minutes, 2, '0', STR_PAD_LEFT); // Asegurar 2 dígitos en minutos organizandolos a la izquierda
+
+            // Convertir minutos a horas (dividir entre 60)
+            $decimalHours = $hours + ($minutes / 60);
+
+            // Almacenar el resultado como un número decimal
+            $task->cantidad_unidades = $decimalHours;
+        } else {
+            // Evaluar expresión matemática de forma segura
+            $task->cantidad_unidades = $this->calculateExpression($request->cantidad_ingresada);
+        }
+        if (preg_match('#^\d+:\d+$#', $request->cantidad_usada)) {
+            // Normalizar el formato (asegurar HH:MM con ceros iniciales)
+            list($hours, $minutes) = explode(':', $request->cantidad_ingresada);// Separar horas y minutos
+
+            $hours = str_pad($hours, 2, '0', STR_PAD_LEFT); // Asegurar 2 dígitos en horas organizandolos a la izquierda
+            $minutes = str_pad($minutes, 2, '0', STR_PAD_LEFT); // Asegurar 2 dígitos en minutos organizandolos a la izquierda
+
+            // Convertir minutos a horas (dividir entre 60)
+            $decimalHours = $hours + ($minutes / 60);
+
+            // Almacenar el resultado como un número decimal
+            $task->cantidad_unidades = $decimalHours;
+        } else {
+            // Evaluar expresión matemática de forma segura
+            $task->cantidad_usada = $this->calculateExpression($request->cantidad_usada);
+        }
+        $task->created_by = 1;
         $task->creation_date = now();
         $task->lote = 1;
         $task->status = 5;
 
+
         $task->save();
 
-        return response()->json(['message' => 'Task created successfully']);
+        return response()->json(['message' => 'Task created successfully'], 201);
     }
 }

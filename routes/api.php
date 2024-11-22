@@ -9,6 +9,9 @@ use App\Http\Controllers\LicenseController;
 use App\Http\Controllers\MeetingController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\WorkerController;
+use App\Http\Controllers\jobController;
+use App\Http\Controllers\ProductController;
 
 Route::get('/', function() { return Redirect::to('/login'); });
 
@@ -21,7 +24,7 @@ Route::controller(AuthController::class)->group(function() {
 Route::controller(TaskController::class)->group(function() {
     Route::get('tasks', 'list');
     Route::get('tasks/create', 'create');
-    Route::post('tasks', 'store');
+    Route::post('tasks/store', 'store');
     Route::post('tasks/search', 'search');
 });
 
@@ -56,6 +59,23 @@ Route::controller(LicenseController::class)->group(function() {
     Route::post('licenses/search', 'search');
     Route::get('licenses/{license_id}/edit', 'edit');
     Route::put('licenses{license_id}', 'update');
+});
+
+Route::controller(ProductController::class)->group(function() {
+    Route::get('products', 'list');
+    Route::get('products/create', 'create');
+    Route::post('products', 'store');
+    Route::post('products/search', 'search');
+    Route::get('products/{product_id}/edit', 'edit');
+    Route::put('products/{product_id}', 'update');
+});
+
+Route::controller(WorkerController::class)->group(function() {
+    Route::post('worker/search', 'search');
+});
+
+Route::controller(JobController::class)->group(function() {
+    Route::post('job/search', 'search');
 });
 
 Route::get('/rosal', function () {
