@@ -11,23 +11,6 @@ class LicenseController extends Controller
 {
     public static function list(Request $request) {
 
-        // $dateIni = $request->session()->get('dateIni') ?? '';
-        // $dateEnd = $request->session()->get('dateEnd') ?? '';
-        // $workerName = $request->session()->get('keyword') ?? '';
-
-        // $licenses = License::query();
-        //     if ($dateIni) {
-        //         $licenses->whereDate('start_date', '>=', $dateIni);
-        //     }
-        //     if ($dateEnd) {
-        //         $licenses->whereDate('start_date', '<=', $dateEnd);
-        //     }
-        //     if ($workerName) {
-        //         $licenses->whereHas('worker', function($query) use ($workerName) {
-        //             $query->whereRaw("UPPER(name) LIKE '%".strtoupper($workerName)."%'");
-        //         });
-        //     }
-
         $licenses = License::where('status', '!=', 28)->with(['worker:user_data_id,name,document_number,document_type', 'creation:user_id,username']);
 
         $licenses = $licenses->orderBy('license_id','desc')->simplePaginate(8);
@@ -108,7 +91,7 @@ class LicenseController extends Controller
         $license->internal_reference = $request->internal_reference;
         $license->observations = $request->observations;
         $license->created_by = 1;
-        $license->creation_date = \Carbon\Carbon::now();
+        $license->creation_date = now()->format('Y-m-d H:i:s'),
         $license->status = 29;
 
         $license->save();
@@ -150,7 +133,7 @@ class LicenseController extends Controller
         $license->observations = $request->observations;
         $license->status = $request->status ?? $license->status;
         $license->updated_by = 1;
-        $license->update_date = \Carbon\Carbon::now();
+        $license->update_date = now()->format('Y-m-d H:i:s'),
 
         $license->save();
 

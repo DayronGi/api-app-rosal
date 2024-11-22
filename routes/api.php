@@ -37,6 +37,7 @@ Route::controller(ScheduleController::class)->group(function() {
 Route::controller(AssignedTaskController::class)->group(function() {
     Route::get('assignedtasks', 'list');
     Route::post('assignedtasks/search', 'search');
+    Route::post('assignedtasks/store', 'store');
     Route::get('assignedtasks/{task_id}', 'view');
 });
 

@@ -14,6 +14,25 @@ class AssignedTask extends Model
 
     protected $table = 'assigned_tasks';
 
+    protected $fillable = [
+        'meeting_id',
+        'start_date',
+        'estimated_time',
+        'units',
+        'type_id',
+        'task_description',
+        'creation_date',
+        'assigned_to',
+        'department_id',
+        'observations',
+        'score',
+        'priority',
+        'created_by',
+        'reviewed_by',
+        'status',
+    ];
+    public $timestamps = false;
+
     public function creation(): BelongsTo
     {
         return $this->belongsTo(UserAccount::class, 'created_by', 'user_id');
