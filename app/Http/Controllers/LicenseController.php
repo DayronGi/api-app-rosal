@@ -81,17 +81,16 @@ class LicenseController extends Controller
     public function store(Request $request) {
         $license = new License();
 
-        $license->license_id = $request->license_id;
         $license->spreadsheet_id = $request->spreadsheet_id ?? '';
         $license->worker_id = $request->worker_id;
-        $license->start_date = $request->start_date." " .$request->start_hour;
+        $license->start_date = $request->end_hour != '' ?$request->start_date." " .$request->start_hour: '';
         $license->end_date = $request->end_hour != '' ? $request->start_date. " " .$request->end_hour : '';
         $license->type = "Permiso";
         $license->motive = $request->motive;
-        $license->internal_reference = $request->internal_reference;
+        $license->internal_reference = "";
         $license->observations = $request->observations;
         $license->created_by = 1;
-        $license->creation_date = now()->format('Y-m-d H:i:s'),
+        $license->creation_date = now()->format('Y-m-d H:i:s');
         $license->status = 29;
 
         $license->save();
@@ -133,7 +132,7 @@ class LicenseController extends Controller
         $license->observations = $request->observations;
         $license->status = $request->status ?? $license->status;
         $license->updated_by = 1;
-        $license->update_date = now()->format('Y-m-d H:i:s'),
+        $license->update_date = now()->format('Y-m-d H:i:s');
 
         $license->save();
 

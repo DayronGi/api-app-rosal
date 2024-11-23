@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Job;
 use App\Models\Product;
 use App\Models\Task;
+use App\Models\TaskType;
 use App\Models\Worker;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
@@ -183,5 +184,12 @@ class TaskController extends Controller
         $task->save();
 
         return response()->json(['message' => 'Task created successfully'], 201);
+    }
+
+    public function taskType(Request $request)
+    {
+        $taskTypes = TaskType::select('type_id','type_description')->distinct()->get();
+
+        return response()->json(['taskTypes' => $taskTypes]);
     }
 }

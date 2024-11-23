@@ -26,6 +26,7 @@ Route::controller(TaskController::class)->group(function() {
     Route::get('tasks/create', 'create');
     Route::post('tasks/store', 'store');
     Route::post('tasks/search', 'search');
+    Route::get('task_type', 'taskType');
 });
 
 Route::controller(ScheduleController::class)->group(function() {
@@ -35,10 +36,10 @@ Route::controller(ScheduleController::class)->group(function() {
 });
 
 Route::controller(AssignedTaskController::class)->group(function() {
-    Route::get('assignedtasks', 'list');
-    Route::post('assignedtasks/search', 'search');
-    Route::post('assignedtasks/store', 'store');
-    Route::get('assignedtasks/{task_id}', 'view');
+    Route::get('assigned_tasks', 'list');
+    Route::post('assigned_tasks/search', 'search');
+    Route::post('assigned_tasks/store', 'store');
+    Route::get('assigned_tasks/{task_id}', 'view');
 });
 
 Route::controller(MeetingController::class)->group(function() {
@@ -56,7 +57,7 @@ Route::controller(HandbookController::class)->group(function() {
 Route::controller(LicenseController::class)->group(function() {
     Route::get('licenses', 'list');
     Route::get('licenses/create', 'create');
-    Route::post('licenses', 'store');
+    Route::post('licenses/store', 'store');
     Route::post('licenses/search', 'search');
     Route::get('licenses/{license_id}/edit', 'edit');
     Route::put('licenses{license_id}', 'update');
