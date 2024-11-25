@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Validator;
 
 class AssignedTaskController extends Controller
 {
+    
     public static function list(Request $request) {
 
         $perPage = $request->get('per_page', 10);
@@ -64,20 +65,13 @@ class AssignedTaskController extends Controller
     {
         // Validar los datos
         $validator = Validator::make($request->all(), [
-            'meeting_id' => 'required|exists:meetings,meeting_id',
             'start_date' => 'required|date',
             'estimated_time' => 'required|numeric|min:0',
-            'units' => 'required|string|max:50',
             'type_id' => 'required|exists:task_types,type_id',
             'task_description' => 'required|string|max:255',
             'assigned_to' => 'required|exists:user_data,user_data_id',
             'department_id' => 'required|exists:departments,department_id',
             'observations' => 'nullable|string|max:1000',
-            'score' => 'nullable|numeric|min:0|max:100',
-            'priority' => 'required|numeric|min:1|max:10',
-            'created_by' => 'required|exists:user_accounts,user_id',
-            'reviewed_by' => 'nullable|exists:user_accounts,user_id',
-            'status' => 'required|numeric|min:0',
         ]);
 
         if ($validator->fails()) {
@@ -89,21 +83,23 @@ class AssignedTaskController extends Controller
 
         // Crear la tarea
         $task = AssignedTask::create([
-            'meeting_id' => $request->meeting_id,
+            'meeting_id' => $request->meeting_id != '' ? $request->meeting_id : null,
             'start_date' => $request->start_date,
             'estimated_time' => $request->estimated_time,
-            'units' => $request->units,
+            'units' => $request->units  != '' ? $request->units : "horas",
             'type_id' => $request->type_id,
             'task_description' => $request->task_description,
             'assigned_to' => $request->assigned_to,
             'department_id' => $request->department_id,
-            'observations' => $request->observations,
-            'score' => $request->score,
+            'observations' => $request->observations != '' ? $request->observations : null,
+            'score' => $request->score != '' ? $request->score : 0,
             "creation_date" => now()->format('Y-m-d H:i:s'),
-            'priority' => $request->priority,
-            'created_by' => $request->created_by,
-            'reviewed_by' => $request->reviewed_by,
-            'status' => $request->status,
+            'priority' => $request->priority != '' ? $request->priority : 1,
+            'created_by' => $request->created_by != '' ? $request->created_by : 1,
+            'reviewed_by' => $request->reviewed_by != '' ? $request->reviewed_by : null,
+            'review_date' => $request->reviewed_by != '' ? now()->format('Y-m-d H:i:s') : null,
+            'status' => 141,
+
         ]);
 
         return response()->json([

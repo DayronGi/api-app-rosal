@@ -12,6 +12,7 @@ use App\Http\Controllers\TaskController;
 use App\Http\Controllers\WorkerController;
 use App\Http\Controllers\jobController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\DepartmentController;
 
 Route::get('/', function() { return Redirect::to('/login'); });
 
@@ -79,6 +80,12 @@ Route::controller(WorkerController::class)->group(function() {
 Route::controller(JobController::class)->group(function() {
     Route::post('job/search', 'search');
 });
+
+Route::controller(DepartmentController::class)->group(function() {
+    Route::get('department', 'list');
+    Route::post('department/search', 'search');
+});
+
 
 Route::get('/rosal', function () {
     return view('organizational.view');
