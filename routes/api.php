@@ -33,7 +33,7 @@ Route::controller(TaskController::class)->group(function() {
 Route::controller(ScheduleController::class)->group(function() {
     Route::get('schedules', 'list');
     Route::get('schedules/{schedule_id}', 'review');
-    Route::post('schedules', 'store');
+    Route::post('schedules/store_reviewed', 'store_reviewed');
 });
 
 Route::controller(AssignedTaskController::class)->group(function() {

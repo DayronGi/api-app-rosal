@@ -8,6 +8,7 @@ use App\Models\ScheduleReview;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class ScheduleController extends Controller
 {
@@ -40,8 +41,29 @@ class ScheduleController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store_reviewed(Request $request)
     {
+        $validator = validator::make($request->all(), [
+            'worker_id' => 'required|array',
+            'worker_id.*' => 'required|integer',
+            'day' => 'required|array',
+            'day.*' => 'required|string',
+            'hour_ini1' => 'required|array',
+            'hour_ini1.*' => 'required|string',
+            'hour_end1' => 'required|array',
+            'hour_end1.*' => 'required|string',
+            'hour_ini2' => 'nullable|array',
+            'hour_ini2.*' => 'nullable|string',
+            'hour_end2' => 'nullable|array',
+            'hour_end2.*' => 'nullable|string',
+            'normal' => 'required|array',
+            'normal.*' => 'required|numeric',
+            'extra' => 'required|array',
+            'extra.*' => 'required|numeric',
+            'review_date' => 'required|date',
+            'type' => 'required|array',
+            'type.*' => 'required|string',
+        ]);
         $scheduleData = [];
 
         foreach ($request->worker_id as $index => $workerId) {
@@ -50,12 +72,14 @@ class ScheduleController extends Controller
                 'day' => $request->day[$index],
                 'hour_ini1' => $request->hour_ini1[$index],
                 'hour_end1' => $request->hour_end1[$index],
-                'hour_ini2' => $request->hour_ini2[$index],
-                'hour_end2' => $request->hour_end2[$index],
+                'hour_ini2' => isset($request->hour_ini2[$index]) && $request->hour_ini2[$index] !== '' ? $request->hour_ini2[$index] : null,
+                'hour_end2' => isset($request->hour_end2[$index]) && $request->hour_end2[$index] !== '' ? $request->hour_end2[$index] : null,
                 'normal' => $request->normal[$index],
                 'extra' => $request->extra[$index],
                 'review_date' => $request->review_date,
                 'type' => $request->type[$index],
+                'reviewed_by' => isset($request->reviewed_by) && $request->reviewed_by !== '' ? $request->reviewed_by : null,
+                'status' => isset($request->status[$index]) && $request->status[$index] !== '' ? $request->status[$index] : 210,
             ];
         }
 
