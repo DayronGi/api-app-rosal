@@ -66,12 +66,14 @@ class AssignedTaskController extends Controller
         // Validar los datos
         $validator = Validator::make($request->all(), [
             'start_date' => 'required|date',
-            'estimated_time' => 'required|numeric|min:0',
+            'estimated_time' => 'nullable|numeric|min:0',
             'type_id' => 'required|exists:task_types,type_id',
             'task_description' => 'required|string|max:255',
-            'assigned_to' => 'required|exists:user_data,user_data_id',
+            'assigned_to' => 'nullable|exists:user_data,user_data_id',
             'department_id' => 'required|exists:departments,department_id',
             'observations' => 'nullable|string|max:1000',
+            'score' => 'required|numeric|min:0|max:100',
+            'priority' => 'required|numeric|min:0|max:10',
         ]);
 
         if ($validator->fails()) {
@@ -85,11 +87,11 @@ class AssignedTaskController extends Controller
         $task = AssignedTask::create([
             'meeting_id' => $request->meeting_id != '' ? $request->meeting_id : null,
             'start_date' => $request->start_date,
-            'estimated_time' => $request->estimated_time,
+            'estimated_time' => $request->estimated_time != '' ? $request->estimated_time : 0,
             'units' => $request->units  != '' ? $request->units : "horas",
             'type_id' => $request->type_id,
             'task_description' => $request->task_description,
-            'assigned_to' => $request->assigned_to,
+            'assigned_to' => $request->assigned_to != '' ? $request->assigned_to : null,
             'department_id' => $request->department_id,
             'observations' => $request->observations != '' ? $request->observations : null,
             'score' => $request->score != '' ? $request->score : 0,

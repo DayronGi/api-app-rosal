@@ -54,9 +54,22 @@ class LicenseController extends Controller
         
         // Ejecutar la consulta y devolver los resultados
             $licenses = $licenses->paginate($perPage);
-    
+            
+            $motives = [
+                'Llega tarde',
+                'Asuntos médicos',
+                'Asuntos personales',
+                'Inasistencia no justificada',
+                'Tiempo compensado',
+                'Trámites empresa',
+                'Trámites personales',
+                'Otros'
+            ];
 
-        return response()->json($licenses);
+            return response()->json([
+                'license'=>$licenses,
+                'motives'=>$motives,
+            ]);
     }
 
     public function create() {
@@ -83,13 +96,13 @@ class LicenseController extends Controller
 
         $license->spreadsheet_id = $request->spreadsheet_id ?? '';
         $license->worker_id = $request->worker_id;
-        $license->start_date = $request->end_hour != '' ?$request->start_date." " .$request->start_hour: '';
-        $license->end_date = $request->end_hour != '' ? $request->start_date. " " .$request->end_hour : '';
-        $license->type = "Permiso";
+        $license->start_date = $request->start_hour != '' ?$request->start_date." " .$request->start_hour: '';
+        $license->end_date = $request->end_hour != '' ? $request->start_date. " " .$request->end_hour : null;
+        $license->type = $request->type != "0" ? "Permiso pagado" : "Permiso";
         $license->motive = $request->motive;
         $license->internal_reference = "";
-        $license->observations = $request->observations;
-        $license->created_by = 1;
+        $license->observations = $request->observations != '' ? $request->observations : null;
+        $license->created_by = $request->created_by != '' ? $request->created_by : 1;
         $license->creation_date = now()->format('Y-m-d H:i:s');
         $license->status = 29;
 
