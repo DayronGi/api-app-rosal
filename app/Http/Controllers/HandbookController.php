@@ -43,7 +43,7 @@ class HandbookController extends Controller
         ])->get();
 
         $chapters = array();
-        $base_url = 'http://192.168.2.7:81/sgrosal/Views/handbooks/';
+        $base_url = '../../../../sgrosal/Views/handbooks/handbooks';
 
         if ($handbook_sections != null) {
             foreach ($handbook_sections as $row) {
