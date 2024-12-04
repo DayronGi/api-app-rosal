@@ -61,7 +61,7 @@ Route::controller(LicenseController::class)->group(function() {
     Route::post('licenses/store', 'store');
     Route::post('licenses/search', 'search');
     Route::get('licenses/{license_id}/edit', 'edit');
-    Route::put('licenses{license_id}', 'update');
+    Route::put('licenses/update', 'update');
 });
 
 Route::controller(ProductController::class)->group(function() {

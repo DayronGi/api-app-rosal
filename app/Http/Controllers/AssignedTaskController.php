@@ -47,11 +47,29 @@ class AssignedTaskController extends Controller
             $assignedtasks->whereDate('start_date', '<=', $dateEnd);
         }
 
-        // Filtrar por nombre de trabajador
-        if ($name) {
-            $assignedtasks->whereHas('worker', function ($query) use ($name) {
-                $query->whereRaw('LOWER(user_data.name) LIKE ?', ['%' . strtolower($name) . '%']);
-            });
+        // Filtrar por nombre o número de cédula
+        if (!empty($request->name)) {
+            $name = $request->name;
+
+            // Validar el formato del input
+            if (preg_match('/^[a-zA-Z\s]+$/', $name)) {
+                // Solo letras: Buscar por nombre
+                $assignedtasks->whereHas('worker', function ($query) use ($name) {
+                    $query->whereRaw('LOWER(user_data.name) LIKE ?', ['%' . strtolower($name) . '%']);
+                });
+            } elseif (preg_match('/^\d+$/', $name)) {
+                // Solo números: Buscar por número de documento
+                $assignedtasks->whereHas('worker', function ($query) use ($name) {
+                    // Solo números: Buscar por número de documento con el orden exacto
+                    $query->where('user_data.document_number', 'LIKE', '%' . $name . '%')
+                              ->whereRaw('user_data.document_number REGEXP ?', [preg_quote($name, '/') . '.*']);
+                });
+            } else {
+                // Solo letras: Buscar por nombre
+                $assignedtasks->whereHas('worker', function ($query) use ($name) {
+                    $query->whereRaw('LOWER(user_data.name) LIKE ?', ['%' . strtolower($name) . '%']);
+                });
+            }
         }
         
         // Ejecutar la consulta y devolver los resultados

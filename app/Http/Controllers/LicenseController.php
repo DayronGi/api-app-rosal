@@ -45,11 +45,29 @@ class LicenseController extends Controller
             $licenses->whereDate('creation_date', '<=', $dateEnd);
         }
 
-        // Filtrar por nombre de trabajador
-        if ($name) {
-            $licenses->whereHas('worker', function ($query) use ($name) {
-                $query->whereRaw('LOWER(user_data.name) LIKE?', ['%' . strtolower($name) . '%']);
-            });
+        // Filtrar por nombre o número de cédula
+        if (!empty($request->name)) {
+            $name = $request->name;
+
+            // Validar el formato del input
+            if (preg_match('/^[a-zA-Z\s]+$/', $name)) {
+                // Solo letras: Buscar por nombre
+                $licenses->whereHas('worker', function ($query) use ($name) {
+                    $query->whereRaw('LOWER(user_data.name) LIKE ?', ['%' . strtolower($name) . '%']);
+                });
+            } elseif (preg_match('/^\d+$/', $name)) {
+                // Solo números: Buscar por número de documento
+                $licenses->whereHas('worker', function ($query) use ($name) {
+                    // Solo números: Buscar por número de documento con el orden exacto
+                    $query->where('user_data.document_number', 'LIKE', '%' . $name . '%')
+                              ->whereRaw('user_data.document_number REGEXP ?', [preg_quote($name, '/') . '.*']);
+                });
+            } else {
+                // Solo letras: Buscar por nombre
+                $licenses->whereHas('worker', function ($query) use ($name) {
+                    $query->whereRaw('LOWER(user_data.name) LIKE ?', ['%' . strtolower($name) . '%']);
+                });
+            }
         }
         
         // Ejecutar la consulta y devolver los resultados
@@ -132,19 +150,20 @@ class LicenseController extends Controller
         ]);
     }
 
-    public function update(int $license_id, Request $request) {
+    public function update(Request $request) {
 
-        $license = License::where('license_id', $license_id)->first();
+        $license = License::where('license_id', $request -> license_id)->first();
 
-        $license->spreadsheet_id = $request->spreadsheet_id;
+        $license->spreadsheet_id = $request->spreadsheet_id != null ? $request->spreadsheet_id : '';
         $license->worker_id = $request->worker_id;
         $license->start_date = $request->start_date." " .$request->start_hour;
         $license->end_date = $request->end_hour != '' ? $request->start_date. " " .$request->end_hour : '';
         $license->motive = $request->motive;
         $license->internal_reference = $request->internal_reference;
+        $license->type = $request->type != "0" ? "Permiso pagado" : "Permiso";
         $license->observations = $request->observations;
-        $license->status = $request->status ?? $license->status;
-        $license->updated_by = 1;
+        $license->status = $request->status;
+        $license->updated_by = $request->updated_by != '' ? $request->updated_by : 1;
         $license->update_date = now()->format('Y-m-d H:i:s');
 
         $license->save();

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Validator;
 
 class ScheduleController extends Controller
 {
+    
     public function list()
     {
        

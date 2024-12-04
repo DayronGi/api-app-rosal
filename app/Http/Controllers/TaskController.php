@@ -56,21 +56,37 @@ class TaskController extends Controller
             $tasks->whereDate('day', '<=', $validatedData['dateEnd']);
         }
 
-        // Filtrar por nombre de trabajador
+        // Filtrar por nombre o número de cédula
         if (!empty($validatedData['name'])) {
-            $name = strtolower($validatedData['name']);
-            $tasks->whereHas('worker', function ($query) use ($name) {
-                $query->whereRaw('LOWER(user_data.name) LIKE ?', ['%' . $name . '%']);
-            });
+            $name = $validatedData['name'];
+
+            // Validar el formato del input
+            if (preg_match('/^[a-zA-Z\s]+$/', $name)) {
+                // Solo letras: Buscar por nombre
+                $tasks->whereHas('worker', function ($query) use ($name) {
+                    $query->whereRaw('LOWER(user_data.name) LIKE ?', ['%' . strtolower($name) . '%']);
+                });
+            } elseif (preg_match('/^\d+$/', $name)) {
+                // Solo números: Buscar por número de documento
+                $tasks->whereHas('worker', function ($query) use ($name) {
+                    // Solo números: Buscar por número de documento con el orden exacto
+                    $query->where('user_data.document_number', 'LIKE', '%' . $name . '%')
+                              ->whereRaw('user_data.document_number REGEXP ?', [preg_quote($name, '/') . '.*']);
+                });
+            } else {
+                // Solo letras: Buscar por nombre
+                $tasks->whereHas('worker', function ($query) use ($name) {
+                    $query->whereRaw('LOWER(user_data.name) LIKE ?', ['%' . strtolower($name) . '%']);
+                });
+            }
         }
+        
 
         // Ejecutar la consulta y devolver los resultados paginados
         $tasks = $tasks->paginate($perPage);
 
         return response()->json($tasks);
     }
-        
-    
 
     public function create() {
         $workers = Worker::select('user_data_id', 'name', 'document_type', 'document_number')->get();

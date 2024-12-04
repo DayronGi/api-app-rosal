@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Validator;
 
 class DepartmentController extends Controller
 {
+
     public function list(Request $request) {
 
         $department = Departmenr::select([  'department_id',
@@ -20,7 +21,6 @@ class DepartmentController extends Controller
         return response()->json(['department' => $department]);
     }
 
-    
     public function search(Request $request)
     {
         
