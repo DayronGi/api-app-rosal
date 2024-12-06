@@ -18,6 +18,7 @@ Route::get('/', function() { return Redirect::to('/login'); });
 
 Route::controller(AuthController::class)->group(function() {
     Route::post('/register', 'register');
+    Route::post('/device/check', 'check');
     Route::post('/login', 'login');
     Route::post('/logout', 'logout');
 });
