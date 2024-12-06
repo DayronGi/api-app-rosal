@@ -19,6 +19,7 @@ class AssignedTaskController extends Controller
         return response()->json(['assignedtasks' => $assignedtasks]);
     }
 
+    
     public function search(Request $request)
     {
         $page = $request->get('page');
