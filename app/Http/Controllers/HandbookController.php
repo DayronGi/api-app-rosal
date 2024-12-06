@@ -72,7 +72,17 @@ class HandbookController extends Controller
                 $row['section_content'] = $this->updateImageUrls($row['section_content'], $base_url);
                 if ($row['section_type'] == 'chapter') {
                     $chapters[$row['hb_section_id']] = $this->buildSectionArray($row, $base_url);
+                $row['section_content'] = $this->updateImageUrls($row['section_content'], $base_url);
+                if ($row['section_type'] == 'chapter') {
+                    $chapters[$row['hb_section_id']] = $this->buildSectionArray($row, $base_url);
                 }
+
+                if ($row['section_type'] == 'section') {
+                    $chapters[$row['chapter_id']]['sections'][$row['hb_section_id']] = $this->buildSectionArray($row, $base_url);
+                }
+
+                if ($row['section_type'] == 'subsection') {
+                    $chapters[$row['chapter_id']]['sections'][$row['section_id']]['subsections'][$row['hb_section_id']] = $this->buildSectionArray($row, $base_url);
 
                 if ($row['section_type'] == 'section') {
                     $chapters[$row['chapter_id']]['sections'][$row['hb_section_id']] = $this->buildSectionArray($row, $base_url);
@@ -88,6 +98,25 @@ class HandbookController extends Controller
             'handbook_sections' => $handbook_sections,
             'chapters' => $chapters
         ]);
+    }
+
+    private function buildSectionArray($row, $base_url)
+    {
+        return [
+            'hb_section_id' => $row['hb_section_id'],
+            'handbook_id' => $row['handbook_id'],
+            'section_type' => $row['section_type'],
+            'section_index' => $row['section_index'],
+            'section_title' => $row['section_title'],
+            'section_content' => $row['section_content'],
+            'status' => $row['status'],
+            'url' => $base_url . 'handbooks/' . $row['hb_section_id'] . '.html'
+        ];
+    }
+
+    private function updateImageUrls($content, $base_url)
+    {
+        return preg_replace('/src=["\'](?!http)([^"\']+)["\']/', 'src="' . $base_url . '$1"', $content);
     }
 
     private function buildSectionArray($row, $base_url)
