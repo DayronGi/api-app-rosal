@@ -14,7 +14,7 @@ class Device extends Model
 
     // Campos que pueden ser llenados de forma masiva
     protected $fillable = [
-        'ui',
+        'uid',
         'pwd',
         'user_id',
         'status',

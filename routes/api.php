@@ -22,7 +22,7 @@ Route::controller(AuthController::class)->group(function() {
     Route::post('/login', 'login');
     Route::post('/logout', 'logout');
 });
-
+Route::middleware(['auth.uid'])->group(function () {
 Route::controller(TaskController::class)->group(function() {
     Route::get('tasks', 'list');
     Route::get('tasks/create', 'create');
@@ -37,12 +37,14 @@ Route::controller(ScheduleController::class)->group(function() {
     Route::post('schedules/store_reviewed', 'store_reviewed');
 });
 
+
 Route::controller(AssignedTaskController::class)->group(function() {
     Route::get('assigned_tasks', 'list');
     Route::post('assigned_tasks/search', 'search');
     Route::post('assigned_tasks/store', 'store');
     Route::get('assigned_tasks/{task_id}', 'view');
 });
+
 
 Route::controller(MeetingController::class)->group(function() {
     Route::get('meetings', 'list');
@@ -86,7 +88,7 @@ Route::controller(DepartmentController::class)->group(function() {
     Route::get('department', 'list');
     Route::post('department/search', 'search');
 });
-
+});
 
 Route::get('/rosal', function () {
     return view('organizational.view');

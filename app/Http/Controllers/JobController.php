@@ -7,7 +7,7 @@ use App\Models\Job;
 
 class JobController extends Controller
 {
-    
+
     public function search(Request $request)
     {
         

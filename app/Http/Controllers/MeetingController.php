@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Redirect;
 
 class MeetingController extends Controller
 {
-
+    
     public static function list(Request $request) {
 
         $perPage = $request->get('per_page', 7);

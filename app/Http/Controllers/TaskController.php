@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Validator;
 
 class TaskController extends Controller
 {
+    
     public function list(Request $request) {
 
            // Obtener parámetros para la paginación

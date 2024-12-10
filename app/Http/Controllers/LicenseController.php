@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Redirect;
 
 class LicenseController extends Controller
 {
+
     public static function list(Request $request) {
 
         $licenses = License::where('status', '!=', 28)->with(['worker:user_data_id,name,document_number,document_type', 'creation:user_id,username']);
