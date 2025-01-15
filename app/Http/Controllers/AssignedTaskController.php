@@ -107,7 +107,7 @@ class AssignedTaskController extends Controller
             'meeting_id' => $request->meeting_id != '' ? $request->meeting_id : null,
             'start_date' => $request->start_date,
             'estimated_time' => $request->estimated_time != '' ? $request->estimated_time : 0,
-            'units' => $request->units  != '' ? $request->units : "horas",
+            'units' => $request->units  != '' ? $request->units : "Sin definir",
             'type_id' => $request->type_id,
             'task_description' => $request->task_description,
             'assigned_to' => $request->assigned_to != '' ? $request->assigned_to : null,
