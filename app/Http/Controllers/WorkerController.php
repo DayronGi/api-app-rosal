@@ -7,18 +7,12 @@ use App\Models\Worker;
 
 class WorkerController extends Controller
 {
-
     public function search(Request $request)
     {
-        
         $name = $request->get('name');
-        $page = 1;
         $perPage = 40;
 
-        $worker = Worker::query()->where('status', '!=', 1)
-                                 ;  
-
-
+        $worker = Worker::query()->where('status', '!=', 1);
         // Filtrar por nombre de trabajador
         if ($name) {
             // Validar el formato del input
@@ -28,14 +22,12 @@ class WorkerController extends Controller
             } elseif (preg_match('/^\d+$/', $name)) {
                 // Solo números: Buscar por número de documento
                 $worker->where('document_number', 'LIKE', '%' . $name . '%')
-                        ->whereRaw('document_number REGEXP ?', [ preg_quote($name, '/') . '.*']);
-            }
-             else {
+                    ->whereRaw('document_number REGEXP ?', [preg_quote($name, '/') . '.*']);
+            } else {
                 $worker->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($name) . '%']);
             }
-           
-         $worker = $worker->paginate($perPage);
-    
+
+            $worker = $worker->paginate($perPage);
 
             return response()->json($worker);
         }

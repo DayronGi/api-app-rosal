@@ -7,29 +7,20 @@ use App\Models\Job;
 
 class JobController extends Controller
 {
-
     public function search(Request $request)
     {
-        
         $name = $request->get('name');
-        $page = 1;
         $perPage = 40;
-        $job = Job::query()->where('status', '!=', 1)
-                                 ;  
-
-
+        $job = Job::query()->where('status', '!=', 1);
         // Filtrar por nombre del trabajo, codigo interno o referencia interna
         if ($name) {
             $job->where(function ($query) use ($name) {
                 $query->whereRaw('LOWER(job_description) LIKE ?', ['%' . strtolower($name) . '%'])
-                      ->orWhereRaw('LOWER(internal_code) LIKE ?', ['%' . strtolower($name) . '%']);
+                    ->orWhereRaw('LOWER(internal_code) LIKE ?', ['%' . strtolower($name) . '%']);
             });
         }
-        
         // Ejecutar la consulta y devolver los resultados
-           
         $job = $job->paginate($perPage);
-    
 
         return response()->json($job);
     }
@@ -44,4 +35,3 @@ class JobController extends Controller
         return response()->json($job);
     }
 }
-

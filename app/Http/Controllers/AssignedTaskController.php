@@ -4,27 +4,22 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\AssignedTask;
-use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
 
 class AssignedTaskController extends Controller
 {
-    
-    public static function list(Request $request) {
-
+    public static function list(Request $request)
+    {
         $perPage = $request->get('per_page', 10);
         //with method is used to eager load the relationships :'D
-        $assignedtasks = AssignedTask::with(['creation', 'worker', 'department'])->simplePaginate($perPage);
+        $assignedtasks = AssignedTask::with(['creation', 'worker', 'department'])->orderBy('creation_date', 'desc')->simplePaginate($perPage);
 
         return response()->json(['assignedtasks' => $assignedtasks]);
     }
 
-    
+
     public function search(Request $request)
     {
-        $page = $request->get('page');
-        
-
         //obtener parametros de la paginación
         $perPage = $request->get('per_page');
         //obtener parametros de busqueda
@@ -33,18 +28,19 @@ class AssignedTaskController extends Controller
         $name = $request->get('name');
 
         $assignedtasks = AssignedTask::query()->where('status', '!=', 28)
-                                    ->with(['worker:user_data_id,name,document_number,document_type',
-                                            'creation:user_id,username',
-                                            'department:department_id,department_name']);
+            ->with([
+                'worker:user_data_id,name,document_number,document_type',
+                'creation:user_id,username',
+                'department:department_id,department_name'
+            ]);
 
-
-        // Filtrar por fecha de inicio  
-        if ($dateIni) { 
-            $assignedtasks->whereDate('start_date', '>=', $dateIni); 
+        // Filtrar por fecha de inicio
+        if ($dateIni) {
+            $assignedtasks->whereDate('start_date', '>=', $dateIni);
         }
 
         // Filtrar por fecha de fin
-        if ($dateEnd) { 
+        if ($dateEnd) {
             $assignedtasks->whereDate('start_date', '<=', $dateEnd);
         }
 
@@ -63,7 +59,7 @@ class AssignedTaskController extends Controller
                 $assignedtasks->whereHas('worker', function ($query) use ($name) {
                     // Solo números: Buscar por número de documento con el orden exacto
                     $query->where('user_data.document_number', 'LIKE', '%' . $name . '%')
-                              ->whereRaw('user_data.document_number REGEXP ?', [preg_quote($name, '/') . '.*']);
+                        ->whereRaw('user_data.document_number REGEXP ?', [preg_quote($name, '/') . '.*']);
                 });
             } else {
                 // Solo letras: Buscar por nombre
@@ -72,10 +68,9 @@ class AssignedTaskController extends Controller
                 });
             }
         }
-        
+
         // Ejecutar la consulta y devolver los resultados
-            $assignedtasks = $assignedtasks->paginate($perPage);
-    
+        $assignedtasks = $assignedtasks->paginate($perPage);
 
         return response()->json($assignedtasks);
     }
@@ -129,7 +124,8 @@ class AssignedTaskController extends Controller
         ], 201);
     }
 
-    public function view($task_id) {
+    public function view($task_id)
+    {
         $assignedtasks = AssignedTask::where('task_id', $task_id)->first();
 
         return response()->json(['assignedtaskss' => $assignedtasks]);

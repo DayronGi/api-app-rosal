@@ -12,12 +12,10 @@ use Illuminate\Support\Facades\Validator;
 
 class ScheduleController extends Controller
 {
-
     public function list()
     {
-       
-        $schedules = Schedule::with(['department', 'scheduledWorkers.worker','scheduledWorkers'=> function($query) {
-            $query->select('scheduled_workers_id', 'schedule_id', 'worker_id', 'day', 'hour_ini1', 'hour_end1', 'hour_ini2', 'hour_end2','normal', 'extra');
+        $schedules = Schedule::with(['department', 'scheduledWorkers.worker', 'scheduledWorkers' => function ($query) {
+            $query->select('scheduled_workers_id', 'schedule_id', 'worker_id', 'day', 'hour_ini1', 'hour_end1', 'hour_ini2', 'hour_end2', 'normal', 'extra');
         }])->get();
 
         return response()->json(['schedules' => $schedules]);
@@ -88,7 +86,6 @@ class ScheduleController extends Controller
 
         return response()->json(['message' => 'Schedule created successfully']);
     }
-
 
     public static function get_schedule_days($schedule_id)
     {

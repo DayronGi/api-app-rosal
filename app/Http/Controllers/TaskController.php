@@ -8,21 +8,20 @@ use App\Models\Task;
 use App\Models\TaskType;
 use App\Models\Worker;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
 
 class TaskController extends Controller
 {
-    
-    public function list(Request $request) {
 
-           // Obtener parámetros para la paginación
-           $perPage = $request->get('per_page');
-
-
-        $tasks = Task::with([   'creation:created_by,user_id,username', 
-                                'worker:user_data_id,document_type,document_number,name',
-                                'job:job_id,job_description'])->paginate($perPage);
+    public function list(Request $request)
+    {
+        // Obtener parámetros para la paginación
+        $perPage = $request->get('per_page');
+        $tasks = Task::with([
+            'creation:created_by,user_id,username',
+            'worker:user_data_id,document_type,document_number,name',
+            'job:job_id,job_description'
+        ])->orderBy('creation_date', 'desc')->paginate($perPage);
 
         return response()->json(['tasks' => $tasks]);
     }
@@ -72,7 +71,7 @@ class TaskController extends Controller
                 $tasks->whereHas('worker', function ($query) use ($name) {
                     // Solo números: Buscar por número de documento con el orden exacto
                     $query->where('user_data.document_number', 'LIKE', '%' . $name . '%')
-                              ->whereRaw('user_data.document_number REGEXP ?', [preg_quote($name, '/') . '.*']);
+                        ->whereRaw('user_data.document_number REGEXP ?', [preg_quote($name, '/') . '.*']);
                 });
             } else {
                 // Solo letras: Buscar por nombre
@@ -81,7 +80,6 @@ class TaskController extends Controller
                 });
             }
         }
-        
 
         // Ejecutar la consulta y devolver los resultados paginados
         $tasks = $tasks->paginate($perPage);
@@ -89,15 +87,16 @@ class TaskController extends Controller
         return response()->json($tasks);
     }
 
-    public function create() {
+    public function create()
+    {
         $workers = Worker::select('user_data_id', 'name', 'document_type', 'document_number')->get();
         $jobs = Job::select('job_id', 'internal_code', 'job_description', 'price')->get();
         $plants =  Product::select('product_id', 'packing')->get();
 
         return response()->json([
-            'workers'=>$workers,
-            'jobs'=>$jobs,
-            'plants'=>$plants
+            'workers' => $workers,
+            'jobs' => $jobs,
+            'plants' => $plants
         ]);
     }
 
@@ -108,7 +107,6 @@ class TaskController extends Controller
         if ($expression == null) {
             return 0;
         }
-
         // Usa eval() de forma controlada
         try {
             return eval("return $expression;");
@@ -119,7 +117,6 @@ class TaskController extends Controller
 
     public function store(Request $request)
     {
-        
         // Validar los datos
         $validator = Validator::make($request->all(), [
             'day' => 'required|date',
@@ -136,7 +133,7 @@ class TaskController extends Controller
             'observations' => 'required|string|max:1000',
             'calification' => 'nullable|numeric|min:0|max:100',
         ]);
-        
+
         if ($validator->fails()) {
             // Personalizar la respuesta
             return response()->json([
@@ -162,7 +159,7 @@ class TaskController extends Controller
         if (preg_match('#^\d+:\d+$#', $request->cantidad_ingresada)) {
 
             // Normalizar el formato (asegurar HH:MM con ceros iniciales)
-            list($hours, $minutes) = explode(':', $request->cantidad_ingresada);// Separar horas y minutos
+            list($hours, $minutes) = explode(':', $request->cantidad_ingresada); // Separar horas y minutos
 
             $hours = str_pad($hours, 2, '0', STR_PAD_LEFT); // Asegurar 2 dígitos en horas organizandolos a la izquierda
             $minutes = str_pad($minutes, 2, '0', STR_PAD_LEFT); // Asegurar 2 dígitos en minutos organizandolos a la izquierda
@@ -178,7 +175,7 @@ class TaskController extends Controller
         }
         if (preg_match('#^\d+:\d+$#', $request->cantidad_usada)) {
             // Normalizar el formato (asegurar HH:MM con ceros iniciales)
-            list($hours, $minutes) = explode(':', $request->cantidad_ingresada);// Separar horas y minutos
+            list($hours, $minutes) = explode(':', $request->cantidad_ingresada); // Separar horas y minutos
 
             $hours = str_pad($hours, 2, '0', STR_PAD_LEFT); // Asegurar 2 dígitos en horas organizandolos a la izquierda
             $minutes = str_pad($minutes, 2, '0', STR_PAD_LEFT); // Asegurar 2 dígitos en minutos organizandolos a la izquierda
@@ -197,15 +194,14 @@ class TaskController extends Controller
         $task->lote = 1;
         $task->status = 5;
 
-
         $task->save();
 
         return response()->json(['message' => 'Task created successfully'], 201);
     }
 
-    public function taskType(Request $request)
+    public function taskType()
     {
-        $taskTypes = TaskType::select('type_id','type_description')->distinct()->get();
+        $taskTypes = TaskType::select('type_id', 'type_description')->distinct()->get();
 
         return response()->json(['taskTypes' => $taskTypes]);
     }

@@ -22,7 +22,7 @@ Route::controller(AuthController::class)->group(function() {
     Route::post('/login', 'login');
     Route::post('/logout', 'logout');
 });
-Route::middleware(['auth.uid'])->group(function () {
+// Route::middleware(['auth.uid'])->group(function () {
 Route::controller(TaskController::class)->group(function() {
     Route::get('tasks', 'list');
     Route::get('tasks/create', 'create');
@@ -88,7 +88,7 @@ Route::controller(DepartmentController::class)->group(function() {
     Route::get('department', 'list');
     Route::post('department/search', 'search');
 });
-});
+// });
 
 Route::get('/rosal', function () {
     return view('organizational.view');
@@ -96,6 +96,6 @@ Route::get('/rosal', function () {
 
 Route::get('/login', function () {
 
-    
+
     return view('login.view');
 });
