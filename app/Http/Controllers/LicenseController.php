@@ -116,7 +116,7 @@ class LicenseController extends Controller
         $license->motive = $request->motive;
         $license->internal_reference = "";
         $license->observations = $request->observations != '' ? $request->observations : null;
-        $license->created_by = $request->created_by != '' ? $request->created_by : 1;
+        $license->created_by = $request->user_id != '' ? $request->user_id : 1;
         $license->creation_date = now()->format('Y-m-d H:i:s');
         $license->status = 29;
 
@@ -159,7 +159,7 @@ class LicenseController extends Controller
         $license->type = $request->type != "0" ? "Permiso pagado" : "Permiso";
         $license->observations = $request->observations;
         $license->status = $request->status;
-        $license->updated_by = $request->updated_by != '' ? $request->updated_by : 1;
+        $license->updated_by = $request->user_id != '' ? $request->user_id : 1;
         $license->update_date = now()->format('Y-m-d H:i:s');
 
         $license->save();

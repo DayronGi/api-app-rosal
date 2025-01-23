@@ -189,7 +189,7 @@ class TaskController extends Controller
             // Evaluar expresión matemática de forma segura
             $task->cantidad_usada = $this->calculateExpression($request->cantidad_usada);
         }
-        $task->created_by = 1;
+        $task->created_by = $request->user_id != '' ? $request->user_id : 1;
         $task->creation_date = now();
         $task->lote = 1;
         $task->status = 5;

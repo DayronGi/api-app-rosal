@@ -41,7 +41,7 @@ class AuthController extends Controller
             // Si el dispositivo ya existe, verificar su estado
             if ($device->status == 2) {
                 // Si el dispositivo está activo, devolver respuesta positiva
-                return response()->json(['exists' => true, 'message' => 'Dispositivo ya registrado y activo.']);
+                return response()->json(['exists' => true, 'user' => 5,'message' => 'Dispositivo ya registrado y activo.']);
             } else if ($device->status == 1) {
                 // Si el dispositivo está inactivo, devolver respuesta negativa
                 return response()->json(['exists' => false, 'message' => 'Dispositivo ya registrado pero inactivo.']);

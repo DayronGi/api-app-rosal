@@ -111,9 +111,9 @@ class AssignedTaskController extends Controller
             'score' => $request->score != '' ? $request->score : 0,
             "creation_date" => now()->format('Y-m-d H:i:s'),
             'priority' => $request->priority != '' ? $request->priority : 1,
-            'created_by' => $request->created_by != '' ? $request->created_by : 1,
-            'reviewed_by' => $request->reviewed_by != '' ? $request->reviewed_by : null,
-            'review_date' => $request->reviewed_by != '' ? now()->format('Y-m-d H:i:s') : null,
+            'created_by' => $request->user_id != '' ? $request->user_id : 1,
+            'reviewed_by' => $request->user_id != '' ? $request->user_id : null,
+            'review_date' => $request->user_id != '' ? now()->format('Y-m-d H:i:s') : null,
             'status' => 141,
 
         ]);

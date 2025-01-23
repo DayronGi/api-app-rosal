@@ -77,7 +77,7 @@ class ScheduleController extends Controller
                 'extra' => $request->extra[$index],
                 'review_date' => $request->review_date,
                 'type' => $request->type[$index],
-                'reviewed_by' => isset($request->reviewed_by) && $request->reviewed_by !== '' ? $request->reviewed_by : null,
+                'reviewed_by' => $request->user_id != '' ? $request->user_id : null,
                 'status' => isset($request->status[$index]) && $request->status[$index] !== '' ? $request->status[$index] : 210,
             ];
         }
