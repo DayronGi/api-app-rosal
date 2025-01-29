@@ -122,7 +122,7 @@ class TaskController extends Controller
             'day' => 'required|date',
             'worker_id' => 'required|exists:user_data,user_data_id',
             'job_id' => 'required|exists:jobs,job_id',
-            'plant_id' => 'required|exists:products,product_id',
+            'plant_id' => 'nullable|exists:products,product_id',
             'plant_from_id' => 'nullable|exists:products,product_id',
             'seccion' => 'nullable|string|max:4',
             'seccion_origen' => 'nullable|string|max:4',
@@ -189,7 +189,7 @@ class TaskController extends Controller
             // Evaluar expresión matemática de forma segura
             $task->cantidad_usada = $this->calculateExpression($request->cantidad_usada);
         }
-        $task->created_by = 1;
+        $task->created_by = $request->user_id;
         $task->creation_date = now();
         $task->lote = 1;
         $task->status = 5;

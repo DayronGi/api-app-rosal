@@ -86,7 +86,7 @@ class AssignedTaskController extends Controller
             'assigned_to' => 'nullable|exists:user_data,user_data_id',
             'department_id' => 'required|exists:departments,department_id',
             'observations' => 'nullable|string|max:1000',
-            'score' => 'required|numeric|min:0|max:100',
+            'score' => 'nullable|numeric|min:0|max:100',
             'priority' => 'required|numeric|min:0|max:10',
         ]);
 
@@ -111,9 +111,9 @@ class AssignedTaskController extends Controller
             'score' => $request->score != '' ? $request->score : 0,
             "creation_date" => now()->format('Y-m-d H:i:s'),
             'priority' => $request->priority != '' ? $request->priority : 1,
-            'created_by' => $request->created_by != '' ? $request->created_by : 1,
-            'reviewed_by' => $request->reviewed_by != '' ? $request->reviewed_by : null,
-            'review_date' => $request->reviewed_by != '' ? now()->format('Y-m-d H:i:s') : null,
+            'created_by' => $request->user_id != '' ? $request->user_id : 1,
+            'reviewed_by' => $request->user_id != '' ? $request->user_id : null,
+            'review_date' => $request->user_id != '' ? now()->format('Y-m-d H:i:s') : null,
             'status' => 141,
 
         ]);
