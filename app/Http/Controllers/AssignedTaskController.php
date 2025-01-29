@@ -8,16 +8,6 @@ use Illuminate\Support\Facades\Validator;
 
 class AssignedTaskController extends Controller
 {
-    public static function list(Request $request)
-    {
-        $perPage = $request->get('per_page', 10);
-        //with method is used to eager load the relationships :'D
-        $assignedtasks = AssignedTask::with(['creation', 'worker', 'department'])->orderBy('creation_date', 'desc')->simplePaginate($perPage);
-
-        return response()->json(['assignedtasks' => $assignedtasks]);
-    }
-
-
     public function search(Request $request)
     {
         //obtener parametros de la paginación
@@ -32,7 +22,7 @@ class AssignedTaskController extends Controller
                 'worker:user_data_id,name,document_number,document_type',
                 'creation:user_id,username',
                 'department:department_id,department_name'
-            ]);
+            ])->orderBy('creation_date', 'desc');
 
         // Filtrar por fecha de inicio
         if ($dateIni) {
@@ -88,6 +78,7 @@ class AssignedTaskController extends Controller
             'observations' => 'nullable|string|max:1000',
             'score' => 'required|numeric|min:0|max:100',
             'priority' => 'required|numeric|min:0|max:10',
+            'user_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -111,8 +102,8 @@ class AssignedTaskController extends Controller
             'score' => $request->score != '' ? $request->score : 0,
             "creation_date" => now()->format('Y-m-d H:i:s'),
             'priority' => $request->priority != '' ? $request->priority : 1,
-            'created_by' => $request->created_by != '' ? $request->created_by : 1,
-            'reviewed_by' => $request->reviewed_by != '' ? $request->reviewed_by : null,
+            'created_by' => $request->user_id,
+            'reviewed_by' => $request->user_id != '' ? $request->user_id : null,
             'review_date' => $request->reviewed_by != '' ? now()->format('Y-m-d H:i:s') : null,
             'status' => 141,
 
@@ -122,12 +113,5 @@ class AssignedTaskController extends Controller
             'message' => 'Task created successfully',
             'data' => $task
         ], 201);
-    }
-
-    public function view($task_id)
-    {
-        $assignedtasks = AssignedTask::where('task_id', $task_id)->first();
-
-        return response()->json(['assignedtaskss' => $assignedtasks]);
     }
 }

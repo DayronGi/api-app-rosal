@@ -12,20 +12,6 @@ use Illuminate\Support\Facades\Validator;
 
 class TaskController extends Controller
 {
-
-    public function list(Request $request)
-    {
-        // Obtener parámetros para la paginación
-        $perPage = $request->get('per_page');
-        $tasks = Task::with([
-            'creation:created_by,user_id,username',
-            'worker:user_data_id,document_type,document_number,name',
-            'job:job_id,job_description'
-        ])->orderBy('creation_date', 'desc')->paginate($perPage);
-
-        return response()->json(['tasks' => $tasks]);
-    }
-
     public function search(Request $request)
     {
         // Validar los parámetros
@@ -44,7 +30,7 @@ class TaskController extends Controller
             'creation:created_by,user_id,username',
             'worker:user_data_id,document_type,document_number,name',
             'job:job_id,job_description'
-        ]);
+        ])->orderBy('creation_date', 'desc');
 
         // Filtrar por fecha de inicio
         if (!empty($validatedData['dateIni'])) {
@@ -132,6 +118,7 @@ class TaskController extends Controller
             'precio_unidad' => 'required|numeric|min:0',
             'observations' => 'required|string|max:1000',
             'calification' => 'nullable|numeric|min:0|max:100',
+            'user_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -189,10 +176,10 @@ class TaskController extends Controller
             // Evaluar expresión matemática de forma segura
             $task->cantidad_usada = $this->calculateExpression($request->cantidad_usada);
         }
-        $task->created_by = 1;
+        $task->created_by = $request->user_id;
         $task->creation_date = now();
-        $task->lote = 1;
-        $task->status = 5;
+        $task->lote = 0;
+        $task->status = $request->user_id == 58 ? 7 :4;
 
         $task->save();
 

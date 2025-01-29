@@ -24,14 +24,4 @@ class JobController extends Controller
 
         return response()->json($job);
     }
-
-    public function store(Request $request)
-    {
-        $job = new Job();
-        $job->job_description = $request->job_description;
-        $job->internal_code = $request->internal_code;
-        $job->status = $request->status;
-        $job->save();
-        return response()->json($job);
-    }
 }

@@ -3,32 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use App\Models\User;
 use App\Models\Device;
 
 class AuthController extends Controller
 {
-    public function login(Request $request)
-    {
-        $credentials = $request->validate([
-            'username' => ['required'],
-            'password' => ['required'],
-        ]);
-
-        $user = User::where('username', $credentials['username'])->first();
-
-        if ($user) {
-            if (sha1($credentials['password']) === $user->password) {
-                return redirect()->route('tasks.list');
-            } else {
-                return response(['message' => 'Credenciales inválidas'], Response::HTTP_UNAUTHORIZED);
-            }
-        } else {
-            return response(['message' => 'Credenciales inválidas'], Response::HTTP_UNAUTHORIZED);
-        }
-    }
-
     public function check(Request $request)
     {
         // Obtener el 'ui' desde la solicitud
@@ -41,7 +20,8 @@ class AuthController extends Controller
             // Si el dispositivo ya existe, verificar su estado
             if ($device->status == 2) {
                 // Si el dispositivo está activo, devolver respuesta positiva
-                return response()->json(['exists' => true, 'message' => 'Dispositivo ya registrado y activo.']);
+                $user = User::where('user_id', $device->user_id)->with('role')->first();
+                return response()->json(['exists' => true, 'user' => $user]);
             } else if ($device->status == 1) {
                 // Si el dispositivo está inactivo, devolver respuesta negativa
                 return response()->json(['exists' => false, 'message' => 'Dispositivo ya registrado pero inactivo.']);

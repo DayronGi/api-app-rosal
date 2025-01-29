@@ -7,17 +7,6 @@ use Illuminate\Http\Request;
 
 class MeetingController extends Controller
 {
-
-    public static function list(Request $request)
-    {
-        $perPage = $request->get('per_page', 7);
-        $meetings = Meeting::with(['worker', 'creation', 'department', 'assistants', 'meeting_topics'])->orderBy('creation_date', 'desc')->simplePaginate($perPage);
-
-        return response()->json([
-            'meetings' => $meetings
-        ]);
-    }
-
     public function search(Request $request)
     {
         //obtener parametros de la paginación
@@ -36,7 +25,7 @@ class MeetingController extends Controller
             'assistants.worker:user_data_id,name', // Incluye los datos del worker dentro de assistants
             'department:department_id,department_name',
             'meeting_topics'
-        ]);
+        ])->orderBy('creation_date', 'desc');
 
         // Filtrar por fecha de inicio
         if ($dateIni) {

@@ -5,20 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Handbook;
 use App\Models\HandbookSection;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redirect;
 
 class HandbookController extends Controller
 {
-    public static function list(Request $request)
-    {
-
-        $perPage = $request->input('per_page', 8);
-
-        $handbooks = Handbook::orderBy('handbook_id', 'desc')->with('creation:user_id,username','department:department_id,department_name','updateByUser:user_id,username')->simplePaginate($perPage);
-
-        return response()->json(['handbooks' => $handbooks]);
-    }
-
     public function search(Request $request)
     {
         //obtener parametros de la paginación
@@ -32,13 +21,13 @@ class HandbookController extends Controller
                                             'department:department_id,department_name',
                                             'updateByUser:user_id,username');
 
-        // Filtrar por fecha de inicio  
+        // Filtrar por fecha de inicio
         if ($departmentName) {
             $handbooks->whereHas('department', function ($query) use ($departmentName) {
                 $query->whereRaw('LOWER(department_name) LIKE ?', ['%' . strtolower($departmentName) . '%']);
             });
         }
-    
+
         // Filtrar por nombre de posición
         if ($positionName) {
             $handbooks->whereRaw('LOWER(position_name) LIKE ? ', ['%' . strtolower($positionName) . '%']);
@@ -48,7 +37,7 @@ class HandbookController extends Controller
         // Filtrar por nombre de trabajador
         if ($handbookTitle) {
             $handbooks->whereRaw('LOWER(handbook_title) LIKE ? ', ['%' . strtolower($handbookTitle) . '%']);
-        
+
         }
 
         // Ejecutar la consulta y devolver los resultados
@@ -65,6 +54,7 @@ class HandbookController extends Controller
         ])->get();
 
         $chapters = array();
+        $base_url = 'https://viveroelrosal.tplinkdns.com:81/Views/handbooks';
 
         if ($handbook_sections != null) {
             foreach ($handbook_sections as $row) {

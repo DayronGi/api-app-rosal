@@ -8,14 +8,6 @@ use App\Models\Worker;
 
 class LicenseController extends Controller
 {
-    public static function list()
-    {
-        $licenses = License::where('status', '!=', 28)->with(['worker:user_data_id,name,document_number,document_type', 'creation:user_id,username']);
-        $licenses = $licenses->orderBy('license_id', 'desc')->simplePaginate(8);
-
-        return response()->json(['licenses' => $licenses]);
-    }
-
     public function search(Request $request)
     {
         //obtener parametros de la paginación
@@ -29,7 +21,7 @@ class LicenseController extends Controller
             ->with([
                 'worker:user_data_id,name,document_number,document_type',
                 'creation:user_id,username'
-            ]);
+            ])->orderBy('creation_date', 'desc');
         // Filtrar por fecha de inicio
         if ($dateIni) {
             $licenses->whereDate('creation_date', '>=', $dateIni);
@@ -116,7 +108,7 @@ class LicenseController extends Controller
         $license->motive = $request->motive;
         $license->internal_reference = "";
         $license->observations = $request->observations != '' ? $request->observations : null;
-        $license->created_by = $request->created_by != '' ? $request->created_by : 1;
+        $license->created_by = $request->user_id;
         $license->creation_date = now()->format('Y-m-d H:i:s');
         $license->status = 29;
 
@@ -153,13 +145,13 @@ class LicenseController extends Controller
         $license->spreadsheet_id = $request->spreadsheet_id != null ? $request->spreadsheet_id : '';
         $license->worker_id = $request->worker_id;
         $license->start_date = $request->start_date . " " . $request->start_hour;
-        $license->end_date = $request->end_hour != '' ? $request->start_date . " " . $request->end_hour : '';
+        $license->end_date = $request->end_hour != '' ? $request->start_date . " " . $request->end_hour : null;
         $license->motive = $request->motive;
         $license->internal_reference = $request->internal_reference;
         $license->type = $request->type != "0" ? "Permiso pagado" : "Permiso";
         $license->observations = $request->observations;
         $license->status = $request->status;
-        $license->updated_by = $request->updated_by != '' ? $request->updated_by : 1;
+        $license->updated_by = $request->user_id;
         $license->update_date = now()->format('Y-m-d H:i:s');
 
         $license->save();
