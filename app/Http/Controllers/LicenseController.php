@@ -108,11 +108,7 @@ class LicenseController extends Controller
         $license->motive = $request->motive;
         $license->internal_reference = "";
         $license->observations = $request->observations != '' ? $request->observations : null;
-<<<<<<< HEAD
         $license->created_by = $request->user_id;
-=======
-        $license->created_by = $request->user_id != '' ? $request->user_id : 1;
->>>>>>> 7a5244593a70bb303cd3f31fffa0ed59eb024a3a
         $license->creation_date = now()->format('Y-m-d H:i:s');
         $license->status = 29;
 

@@ -41,10 +41,4 @@ class AuthController extends Controller
         // Respuesta por defecto (en caso de que algo salga mal)
         return response()->json(['exists' => false, 'message' => 'Error al procesar la solicitud.']);
     }
-<<<<<<< HEAD
 }
-=======
-
-
-}
->>>>>>> 7a5244593a70bb303cd3f31fffa0ed59eb024a3a
