@@ -33,15 +33,16 @@ class AuthController extends Controller
     {
         // Obtener el 'ui' desde la solicitud
         $uid = $request->uid;
-
+    
         // Verificar si el dispositivo ya existe
         $device = Device::where('uid', $uid)->first();
-
+    
         if ($device) {
             // Si el dispositivo ya existe, verificar su estado
             if ($device->status == 2) {
                 // Si el dispositivo está activo, devolver respuesta positiva
-                return response()->json(['exists' => true, 'user' => 5,'message' => 'Dispositivo ya registrado y activo.']);
+                $user = User::find($device->user_id);
+                return response()->json(['exists' => true, 'user' => $user]);
             } else if ($device->status == 1) {
                 // Si el dispositivo está inactivo, devolver respuesta negativa
                 return response()->json(['exists' => false, 'message' => 'Dispositivo ya registrado pero inactivo.']);
@@ -54,10 +55,13 @@ class AuthController extends Controller
                 'user_id' => 1, // Ajusta según tu lógica de asignación de usuario
                 'status' => 1, // Estado inicial del dispositivo (inactivo)
             ]);
-
+    
             return response()->json(['exists' => false, 'message' => 'Dispositivo registrado exitosamente.']);
         }
+    
         // Respuesta por defecto (en caso de que algo salga mal)
         return response()->json(['exists' => false, 'message' => 'Error al procesar la solicitud.']);
     }
+
+
 }

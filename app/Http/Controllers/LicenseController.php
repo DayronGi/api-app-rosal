@@ -153,7 +153,7 @@ class LicenseController extends Controller
         $license->spreadsheet_id = $request->spreadsheet_id != null ? $request->spreadsheet_id : '';
         $license->worker_id = $request->worker_id;
         $license->start_date = $request->start_date . " " . $request->start_hour;
-        $license->end_date = $request->end_hour != '' ? $request->start_date . " " . $request->end_hour : '';
+        $license->end_date = $request->end_hour != '' ? $request->start_date . " " . $request->end_hour : null;
         $license->motive = $request->motive;
         $license->internal_reference = $request->internal_reference;
         $license->type = $request->type != "0" ? "Permiso pagado" : "Permiso";

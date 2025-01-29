@@ -86,7 +86,7 @@ class AssignedTaskController extends Controller
             'assigned_to' => 'nullable|exists:user_data,user_data_id',
             'department_id' => 'required|exists:departments,department_id',
             'observations' => 'nullable|string|max:1000',
-            'score' => 'required|numeric|min:0|max:100',
+            'score' => 'nullable|numeric|min:0|max:100',
             'priority' => 'required|numeric|min:0|max:10',
         ]);
 
