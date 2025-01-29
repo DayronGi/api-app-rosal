@@ -68,6 +68,7 @@ Route::middleware(['auth.uid'])->group(function () {
     });
 
     Route::controller(DepartmentController::class)->group(function () {
+        Route::get('department', 'list');
         Route::post('department/search', 'search');
     });
 });

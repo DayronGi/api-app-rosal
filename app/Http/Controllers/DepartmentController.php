@@ -7,6 +7,19 @@ use Illuminate\Http\Request;
 
 class DepartmentController extends Controller
 {
+    public function list()
+    {
+        $department = Department::select([
+            'department_id',
+            'department_code',
+            'department_name',
+            'has_storage',
+            'status'
+        ])->get();
+
+        return response()->json(['department' => $department]);
+    }
+
     public function search(Request $request)
     {
         $department_name = $request->get('departmentName');
