@@ -14,7 +14,7 @@ class HandbookController extends Controller
         $perPage = $request->get('per_page');
         //obtener parametros de busqueda
         $departmentName = $request->get('departmentName');
-        $positionName = $request->get('positionName');
+        $description = $request->get('description');
         $handbookTitle = $request->get('handbookTitle');
 
         $handbooks = Handbook::query()->with(   'creation:user_id,username',
@@ -29,8 +29,8 @@ class HandbookController extends Controller
         }
 
         // Filtrar por nombre de posición
-        if ($positionName) {
-            $handbooks->whereRaw('LOWER(position_name) LIKE ? ', ['%' . strtolower($positionName) . '%']);
+        if ($description) {
+            $handbooks->whereRaw('LOWER(handbook_description) LIKE ? ', ['%' . strtolower($description) . '%']);
 
         }
 
