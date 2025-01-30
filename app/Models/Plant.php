@@ -11,9 +11,6 @@ class Plant extends Model
     use HasFactory;
 
     protected $table = 'plants';
+    protected $primaryKey = 'plant_id';
 
-    public function products(): HasMany
-    {
-        return $this->hasMany(Product::class, 'plant_id', 'plant_id');
-    }
 }

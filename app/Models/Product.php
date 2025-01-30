@@ -11,9 +11,6 @@ class Product extends Model
     use HasFactory;
 
     protected $table = 'products';
+    protected $primaryKey = 'product_id';
 
-    public function plant(): BelongsTo
-    {
-        return $this->belongsTo(Plant::class, 'plant_id', 'plant_id');
-    }
 }

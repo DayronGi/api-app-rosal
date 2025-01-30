@@ -19,7 +19,8 @@ class ProductController extends Controller
         if ($name) {
             $product->where(function ($query) use ($name) {
                 $query->whereRaw('LOWER(shortname) LIKE ?', ['%' . strtolower($name) . '%'])
-                    ->orWhereRaw('LOWER(packing) LIKE ?', ['%' . strtolower($name) . '%']);
+                    ->orWhereRaw('LOWER(packing) LIKE ?', ['%' . strtolower($name) . '%'])
+                    ->orWhereRaw('LOWER(product_id) LIKE ?', ['%' . strtolower($name) . '%']);
             });
         }
 
