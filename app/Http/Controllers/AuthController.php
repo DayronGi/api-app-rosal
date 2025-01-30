@@ -20,7 +20,7 @@ class AuthController extends Controller
             // Si el dispositivo ya existe, verificar su estado
             if ($device->status == 2) {
                 // Si el dispositivo está activo, devolver respuesta positiva
-                $user = User::where('user_id', $device->user_id)->with('role')->first();
+                $user = User::where('user_id', $device->user_id)->with('role:role_id,role_name')->first();
                 return response()->json(['exists' => true, 'user' => $user]);
             } else if ($device->status == 1) {
                 // Si el dispositivo está inactivo, devolver respuesta negativa

@@ -2,11 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Job;
-use App\Models\Product;
 use App\Models\Task;
 use App\Models\TaskType;
-use App\Models\Worker;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -26,7 +23,7 @@ class TaskController extends Controller
         $perPage = $validatedData['per_page'] ?? 10;
 
         // Construir la consulta
-        $tasks = Task::query()->with([
+        $tasks = Task::query()->whereIn('status', [4, 7])->with([
             'creation:created_by,user_id,username',
             'worker:user_data_id,document_type,document_number,name',
             'job:job_id,job_description',
@@ -72,19 +69,6 @@ class TaskController extends Controller
         $tasks = $tasks->paginate($perPage);
 
         return response()->json($tasks);
-    }
-
-    public function create()
-    {
-        $workers = Worker::select('user_data_id', 'name', 'document_type', 'document_number')->get();
-        $jobs = Job::select('job_id', 'internal_code', 'job_description', 'price')->get();
-        $plants =  Product::select('product_id', 'packing')->get();
-
-        return response()->json([
-            'workers' => $workers,
-            'jobs' => $jobs,
-            'plants' => $plants
-        ]);
     }
 
     //funcion para calcular la expresion matematica de eval
