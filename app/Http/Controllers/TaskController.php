@@ -27,7 +27,7 @@ class TaskController extends Controller
             'creation:created_by,user_id,username',
             'worker:user_data_id,document_type,document_number,name',
             'job:job_id,job_description',
-            'plant:plant_id,shortname'
+            'plant:product_id,shortname',
         ])->orderBy('creation_date', 'desc');
 
         // Filtrar por fecha de inicio
@@ -121,9 +121,9 @@ class TaskController extends Controller
         $task->job_id = $request->job_id;
         $task->plant_id = $request->plant_id;
         $task->plant_from_id = $request->plant_from_id;
-        $task->seccion = $request->seccion ?? '';
-        $task->seccion_origen = $request->seccion_origen ?? '';
-        $task->mesa = $request->mesa ?? '';
+        $task->seccion = $request->seccion ?? "";
+        $task->seccion_origen = $request->seccion_origen ?? "";
+        $task->mesa = $request->mesa ?? "";
         $task->cantidad_ingresada = $request->cantidad_ingresada;
         $task->precio_unidad = $request->precio_unidad;
         $task->observations = $request->observations;
