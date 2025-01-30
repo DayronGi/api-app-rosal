@@ -17,8 +17,7 @@ class LicenseController extends Controller
         $dateEnd = $request->get('dateEnd');
         $name = $request->get('name');
 
-        $licenses = License::query()->where('status', '!=', 28)
-            ->with([
+        $licenses = License::query()->whereIn('status', [29, 30])->with([
                 'worker:user_data_id,name,document_number,document_type',
                 'creation:user_id,username'
             ])->orderBy('creation_date', 'desc');

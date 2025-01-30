@@ -35,7 +35,7 @@ class Task extends Model
 
     public function plant(): BelongsTo
     {
-        return $this->belongsTo(Product::class, 'plant_from_id', 'product_id');
+        return $this->belongsTo(PlantProduct::class, 'product_id', 'plant_id');
     }
 
 }

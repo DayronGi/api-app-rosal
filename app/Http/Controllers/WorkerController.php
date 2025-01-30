@@ -12,7 +12,7 @@ class WorkerController extends Controller
         $name = $request->get('name');
         $perPage = 40;
 
-        $worker = Worker::query()->where('status', '!=', 1);
+        $worker = Worker::query()->where('status', 1)->where('is_employee', 1);
         // Filtrar por nombre de trabajador
         if ($name) {
             // Validar el formato del input
