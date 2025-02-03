@@ -11,6 +11,7 @@ class Task extends Model
     use HasFactory;
 
     protected $table = 'tasks';
+    protected $primaryKey = 'task_id';
 
     protected $casts = [
         'day' => 'date',
