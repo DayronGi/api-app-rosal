@@ -10,7 +10,6 @@ class Plant extends Model
     use HasFactory;
 
     protected $table = 'plants';
-    protected $primaryKey = 'plant_id';
 
     protected $primaryKey = 'plant_id';
 }
