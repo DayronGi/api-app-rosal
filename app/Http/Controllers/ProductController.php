@@ -12,7 +12,12 @@ class ProductController extends Controller
     {
         $name = $request->get('name');
         $perPage = 40;
-        $product = Product::query()->where('status', 2)->orderBy('packing', 'asc');
+        $product = Product::select('product_id', 'product_description', 'packing', 'section')
+            ->selectRaw("CONCAT(TRIM(product_id), ' [', TRIM(line_id), '] - ', TRIM(shortname)) AS common_name")
+            ->whereIn('line_id', ['20', '26', '33', '40'])
+            ->where('status', 2)
+            ->orderBy('shortname')
+            ->orderBy('packing', 'DESC');
 
         // Filtrar por nombre del trabajo, codigo interno o referencia interna
         if ($name) {

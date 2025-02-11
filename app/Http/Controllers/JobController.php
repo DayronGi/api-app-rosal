@@ -10,8 +10,8 @@ class JobController extends Controller
     public function search(Request $request)
     {
         $name = $request->get('name');
-        $perPage = 40;
-        $job = Job::query()->where('status', '!=', 1);
+        $perPage = 200;
+        $job = Job::query()->where('status', 2)->orderBy('status', 'DESC')->orderBy('internal_code', 'ASC');
         // Filtrar por nombre del trabajo, codigo interno o referencia interna
         if ($name) {
             $job->where(function ($query) use ($name) {

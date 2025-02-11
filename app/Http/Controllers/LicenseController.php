@@ -106,7 +106,7 @@ class LicenseController extends Controller
         $license->type = $request->type != "0" ? "Permiso pagado" : "Permiso";
         $license->motive = $request->motive;
         $license->internal_reference = "";
-        $license->observations = $request->observations != '' ? $request->observations : null;
+        $license->observations = $request->observations != '' ? $request->observations : '';
         $license->created_by = $request->user_id;
         $license->creation_date = now()->format('Y-m-d H:i:s');
         $license->status = 29;
