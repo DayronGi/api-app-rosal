@@ -101,7 +101,7 @@ class TaskController extends Controller
             'cantidad_ingresada' => 'required|string|min:0',
             'cantidad_usada' => 'nullable|string|min:0',
             'precio_unidad' => 'required|numeric|min:0',
-            'observations' => 'required|string|max:1000',
+            'observations' => 'nullable|string|max:1000',
             'calification' => 'nullable|numeric|min:0|max:100',
             'user_id' => 'required',
         ]);
@@ -126,7 +126,7 @@ class TaskController extends Controller
         $task->mesa = $request->mesa ?? "";
         $task->cantidad_ingresada = $request->cantidad_ingresada;
         $task->precio_unidad = $request->precio_unidad;
-        $task->observations = $request->observations;
+        $task->observations = $request->observations ?? "";
         $task->calification = $request->calification;
         if (preg_match('#^\d+:\d+$#', $request->cantidad_ingresada)) {
 
@@ -171,32 +171,32 @@ class TaskController extends Controller
         return response()->json(['message' => 'Task created successfully', 'task' => $task], 201);
     }
     public function delete(Request $request)
-{
-    // Validar que el task_id es requerido y existe en la tabla tasks
-    $validator = Validator::make($request->all(), [
-        'task_id' => 'required|exists:tasks,task_id',
-    ]);
+    {
+        // Validar que el task_id es requerido y existe en la tabla tasks
+        $validator = Validator::make($request->all(), [
+            'task_id' => 'required|exists:tasks,task_id',
+        ]);
 
-    if ($validator->fails()) {
-        return response()->json([
-            'message' => 'Validation Error',
-            'errors' => $validator->errors()
-        ], 422);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation Error',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        // Buscar la tarea
+        $task = Task::find($request->task_id);
+
+        if (!$task) {
+            return response()->json(['message' => 'No se encontro la tarea'], 404);
+        }
+
+        // Actualizar el estado a 6
+        $task->status = 6;
+        $task->save();
+
+        return response()->json(['success' => true, 'message' => 'Tarea actualizada con exito'], 200);
     }
-
-    // Buscar la tarea
-    $task = Task::find($request->task_id);
-
-    if (!$task) {
-        return response()->json(['message' => 'No se encontro la tarea'], 404);
-    }
-
-    // Actualizar el estado a 6
-    $task->status = 6;
-    $task->save();
-
-    return response()->json(['success' => true, 'message' => 'Tarea actualizada con exito'], 200);
-}
 
 
     public function taskType()

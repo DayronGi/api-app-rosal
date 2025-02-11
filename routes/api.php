@@ -23,7 +23,7 @@ Route::middleware(['auth.uid'])->group(function () {
         Route::post('tasks/store', 'store');
         Route::post('tasks/search', 'search');
         Route::get('task_type', 'taskType');
-        Route::post('tasks/delete', 'delete');
+        Route::put('tasks/delete', 'delete');
     });
 
     Route::controller(ScheduleController::class)->group(function () {
