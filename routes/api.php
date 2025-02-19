@@ -17,7 +17,7 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('/device', 'check');
 });
 
-Route::middleware(['auth.uid'])->group(function () {
+// Route::middleware(['auth.uid'])->group(function () {
     Route::controller(TaskController::class)->group(function () {
         Route::get('tasks/create', 'create');
         Route::post('tasks/store', 'store');
@@ -72,4 +72,4 @@ Route::middleware(['auth.uid'])->group(function () {
         Route::get('department', 'list');
         Route::post('department/search', 'search');
     });
-});
+// });
