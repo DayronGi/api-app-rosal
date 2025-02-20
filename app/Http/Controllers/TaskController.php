@@ -162,7 +162,7 @@ class TaskController extends Controller
             $task->cantidad_usada = $this->calculateExpression($request->cantidad_usada);
         }
         $task->created_by = $request->user_id;
-        $task->creation_date = now();
+        $task->creation_date = $request->creation_date;
         $task->lote = 0;
         $task->status = $request->user_id == 58 ? 7 :4;
 
