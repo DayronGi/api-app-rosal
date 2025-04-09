@@ -12,6 +12,8 @@ use App\Http\Controllers\WorkerController;
 use App\Http\Controllers\jobController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\ProductSectionController;
+use App\Http\Controllers\ProductMovementController;
 
 Route::controller(AuthController::class)->group(function () {
     Route::post('/device', 'check');
@@ -71,5 +73,20 @@ Route::controller(AuthController::class)->group(function () {
     Route::controller(DepartmentController::class)->group(function () {
         Route::get('department', 'list');
         Route::post('department/search', 'search');
+    });
+
+    Route::controller(ProductSectionController::class)->group(function () {
+        Route::get('product_section', 'list');
+        Route::post('product_section/store', 'store');
+        Route::put('product_section/{product_id}/{section}/update', 'update');
+        Route::put('product_section/{product_id}/{section}/delete', 'delete');
+    });
+
+    Route::controller(ProductMovementController::class)->group(function () {
+        Route::get('product_movement', 'list');
+        Route::get('product_movement/{movement_id}', 'get');
+        Route::post('product_movement/store', 'store');
+        Route::put('product_movement/{movement_id}/approve', 'approve');
+        Route::put('product_movement/{movement_id}/delete', 'delete');
     });
 // });
